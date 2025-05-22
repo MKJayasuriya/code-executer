@@ -1,0 +1,22 @@
+[
+    {
+        "language": "python",
+        "code": "def fib(n):\n    a, b = 0, 1\n    for _ in range(n):\n        a, b = b, a + b\n    return a\n\ndef test_fib():\n    assert fib(10) == 55, 'Test failed!'\n    print('Test passed!')\n\nif __name__ == '__main__':\n    test_fib()"
+    },
+    {
+        "language": "cpp",
+        "code": "#include <iostream>\n#include <cassert>\nint fib(int n) { int a=0,b=1; for(int i=0;i<n;++i){int t=a;a=b;b=t+b;} return a; }\nvoid test_fib() { assert(fib(10) == 55); std::cout << \"Test passed!\" << std::endl; }\nint main() { test_fib(); return 0; }"
+    },
+    {
+        "language": "javascript",
+        "code": "function fib(n){let a=0,b=1;for(let i=0;i<n;i++){[a,b]=[b,a+b];}return a;}\nfunction testFib(){ if(fib(10)!==55) throw new Error('Test failed!'); console.log('Test passed!'); }\ntestFib();"
+    },
+    {
+        "language": "java",
+        "code": "public class Main { public static int fib(int n){ int a=0,b=1; for(int i=0;i<n;i++){ int t=a; a=b; b=t+b; } return a; } public static void testFib(){ if(fib(10)!=55) throw new RuntimeException(\"Test failed!\"); System.out.println(\"Test passed!\"); } public static void main(String[] args){ testFib(); } }"
+    },
+    {
+        "language": "python",
+        "code": "print('Hello from Python!')"
+    }
+]
