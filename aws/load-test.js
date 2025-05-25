@@ -1,9 +1,9 @@
-import http from 'k6/http';
-import { check } from 'k6';
+import http from "k6/http";
+import { check, sleep } from "k6";
 
-export const options = {
-    vus: 30,
-    duration: '30s',
+export let options = {
+    vus: 30, // 30 virtual users
+    duration: "1m",
 };
 
 const BASE_URL = __ENV.BASE_URL || 'http://0.0.0.0:3000';
@@ -19,7 +19,7 @@ def fib(n):
     return a
 
 print(fib(20))  # Should print 6765
-        `.trim(),
+    `.trim(),
         expected: "6765"
     },
     {
@@ -27,7 +27,7 @@ print(fib(20))  # Should print 6765
         code: `
 function fib(n){ let a=0,b=1; for(let i=0;i<n;i++){ [a,b] = [b,a+b]; } return a; }
 console.log(fib(20)); // Should print 6765
-        `.trim(),
+    `.trim(),
         expected: "6765"
     },
     {
@@ -47,7 +47,7 @@ public class Main {
         return a;
     }
 }
-        `.trim(),
+    `.trim(),
         expected: "6765"
     },
     {
@@ -70,35 +70,38 @@ int main() {
     cout << fib(20) << endl;
     return 0;
 }
-        `.trim(),
+    `.trim(),
         expected: "6765"
     }
 ];
 
 export default function () {
-    const test = tests[Math.floor(Math.random() * tests.length)];
+    for (const test of tests) {
+        const payload = JSON.stringify({
+            language: test.language,
+            code: test.code,
+        });
 
-    const res = http.post(`${BASE_URL}/execute`, JSON.stringify(test), {
-        headers: { "Content-Type": "application/json" },
-    });
+        const headers = {
+            "Content-Type": "application/json",
+        };
 
-    const passed = check(res, {
-        "status is 200": (r) => r.status === 200,
-        "output contains expected": (r) => {
-            try {
-                const body = JSON.parse(r.body);
-                return body.output.trim().includes(test.expected);
-            } catch {
-                return false;
-            }
-        },
-    });
+        const res = http.post(`${BASE_URL}/execute`, payload, { headers });
 
-    if (!passed) {
-        console.log(`❌ Failed test for language: ${test.language}`);
-        console.log(`Code:\n${test.code}`);
-        console.log(`Response status: ${res.status}`);
-        console.log(`Expected output: ${test.expected}`);
-        console.log(`Actual response:\n${res.body}`);
+        const passed = check(res, {
+            [`${test.language}: status is 200`]: (r) => r.status === 200,
+            [`${test.language}: output is correct`]: (r) =>
+                r.body.trim().includes(test.expected),
+        });
+
+        if (!passed) {
+            console.log(`❌ Failed test for language: ${test.language}`);
+            console.log(`Code:\n${test.code}`);
+            console.log(`Response status: ${res.status}`);
+            console.log(`Expected output: ${test.expected}`);
+            console.log(`Actual response:\n${res.body}`);
+        }
+
+        sleep(1);
     }
 }
