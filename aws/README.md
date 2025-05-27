@@ -105,6 +105,27 @@ k6 run /home/user/workspace/code-executer/aws/load-test.js
 - `GET /stats`  
   Returns per-language execution counts.
 
+## UI
+
+A simple web UI is provided for testing the code execution API, built with Rust server-side rendering (SSR) using [Axum](https://github.com/tokio-rs/axum) and [askama](https://github.com/djc/askama).
+
+Features:
+- Select language (Python, JavaScript, Java, C++)
+- Code editor (textarea)
+- Output viewer
+- Execute button calls the `/execute` API and displays the result
+
+### Running the UI
+
+1. Make sure the backend server is running.
+2. Start the server (the UI is served at `/ui`):
+
+    ```
+    ./execute-test-v2
+    ```
+
+3. Open [http://localhost:3000/ui](http://localhost:3000/ui) in your browser.
+
 ## Security Notes
 
 - All code runs as the restricted `code_runner` user.

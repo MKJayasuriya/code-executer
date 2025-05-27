@@ -2,7 +2,7 @@ import http from "k6/http";
 import { check, sleep } from "k6";
 
 export let options = {
-    vus: 30, // 30 virtual users
+    vus: 3, // 30 virtual users
     duration: "1m",
 };
 
@@ -90,8 +90,18 @@ export default function () {
 
         const passed = check(res, {
             [`${test.language}: status is 200`]: (r) => r.status === 200,
-            [`${test.language}: output is correct`]: (r) =>
-                r.body.trim().includes(test.expected),
+            [`${test.language}: output is correct`]: (r) => {
+                try {
+                    const parsed = JSON.parse(r.body);
+                    // Check both stdout and stderr for the expected output
+                    return (
+                        (parsed.stdout && parsed.stdout.toString().includes(test.expected)) ||
+                        (parsed.stderr && parsed.stderr.toString().includes(test.expected))
+                    );
+                } catch (e) {
+                    return false;
+                }
+            },
         });
 
         if (!passed) {

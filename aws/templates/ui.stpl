@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Code Executor UI</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+        }
+
+        textarea {
+            font-family: monospace;
+            font-size: 16px;
+            width: 100%;
+        }
+
+        select,
+        button {
+            font-size: 16px;
+        }
+
+        .output {
+            background: #f7f7f7;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Code Executor UI</h1>
+
+    <form method="post" action="/ui">
+        <label>
+            Language:
+            <select name="language" id="language" onchange="updateCode()">
+                <% for (value, label) in languages { %>
+                    <option value="<%= value %>" <% if value==language { %>selected<% } %>>
+                            <%= label %>
+                    </option>
+                    <% } %>
+            </select>
+        </label>
+        <br><br>
+
+        <label>
+            Code:<br>
+            <textarea name="code" id="code" rows="12" cols="80"><%= code %></textarea>
+        </label>
+        <br>
+        <button type="submit">Execute</button>
+    </form>
+
+    <br>
+    <label>
+        Output:<br>
+        <textarea class="output" rows="10" cols="80" readonly><%= output %></textarea>
+    </label>
+
+    <% if let Some(status)=status { %>
+        <div>Status: <%= status %>
+        </div>
+        <% } %>
+
+            <script>
+                // Embedded examples passed from server
+                const examples = {
+            <% for (lang, example) in examples { %>
+                    "<%= lang %>": `<%= example.replace("\\", "\\\\").replace("`", "\\`") %>`,
+            <% } %>
+        };
+
+                function updateCode() {
+                    const lang = document.getElementById("language").value;
+                    const codeArea = document.getElementById("code");
+                    if (examples[lang]) {
+                        codeArea.value = examples[lang];
+                    }
+                }
+            </script>
+</body>
+
+</html>
